@@ -6,12 +6,15 @@ import org.mockito.*;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class UserTest {
-    Reservation reservation = Mockito.mock(Reservation.class);
+    List<Reservation> reservations;
     @Mock Address address;
     @Mock User.Role role;
     @InjectMocks private User user;
@@ -21,16 +24,28 @@ public class UserTest {
     }
     @BeforeEach
     void setup(){
-        user = create_user();
-
+        reservations = Arrays.asList(
+                Mockito.mock(Reservation.class),
+                Mockito.mock(Reservation.class)
+        );
     }
 
+    @Tag("Test to check if the AddReservation works.")
     @Test
     public void testAddReservation(){
+        Reservation reservation = reservations.get(0);
         user.addReservation(reservation);
-        System.out.println(user.getReservations());
         assertTrue(user.getReservations().contains(reservation));
-        int id = reservation.getReservationNumber();
-        assertEquals(0,id);
+        int reservationNumber = reservation.getReservationNumber();
+        assertEquals(0,reservationNumber);
+    }
+
+    @Tag("Test if getReservation that gets an ID works.")
+    @Test
+    public void testCheckReservation(){
+        Reservation reservation = reservations.get(1);
+        user.addReservation(reservation);
+        int reservationNumber = reservation.getReservationNumber();
+        assertEquals(reservation,user.getReservation(reservationNumber));
     }
 }
