@@ -22,7 +22,7 @@ public class Restaurant {
                       String description, Address address, String imageLink) {
         this.id = idCounter++;
         this.name = name;
-        this.manager = manager;
+           this.manager = manager;
         this.type = type;
         this.startTime = startTime;
         this.endTime = endTime;
