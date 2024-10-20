@@ -23,6 +23,7 @@ public class ReviewService {
         Restaurant restaurant = ServiceUtils.findRestaurant(restaurantId, db.restaurants);
         if (restaurant == null) {
             throw new RestaurantNotFound();
+
         }
         PagedList<Review> reviews = new PagedList<>(restaurant.getReviews(), page, ServiceUtils.REVIEW_PAGE_SIZE);
         return reviews;
