@@ -4,14 +4,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.as;
+import static org.junit.jupiter.api.Assertions.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -24,47 +29,87 @@ public class RestaurantTest {
         Address address = Mockito.mock(Address.class);
         restaurant = new Restaurant("name", manager, "type", LocalTime.of(7, 10, 19), LocalTime.of(23, 10, 20),
                 "description", address, "link");
-
         return restaurant;
     }
 
+    private Table getDummyTable(){
+        return new Table(1,1,1);
+    }
 
+    @BeforeEach
+    public void setup(){
+        restaurant = createDummyRestaurant();
+    }
     @Tag("testing if addTable works")
     @Test
     public void testAddTableWorks(){
-        fail();
+        Table table = getDummyTable();
+        restaurant.addTable(table);
+        assertThat(restaurant.getTables()).contains(table);
+        assertEquals(1,table.getTableNumber());
     }
 
 
     @Tag("testing if getTable finds existing table")
     @Test
     public void testGetTableFindsExistingTable(){
-        fail();
+        Table table = getDummyTable();
+        restaurant.addTable(table);
+        int table_number = table.getTableNumber();
+        assertEquals(table,restaurant.getTable(table_number));
     }
 
     @Tag("testing if getTable does not find the specified table")
     @Test
     public void testGetTableDoesNotFindSpecifiedTable(){
-        fail();
-    }
+        Table table = getDummyTable();
+        restaurant.addTable(table);
+        int table_number = table.getTableNumber();
+        assertNull(restaurant.getTable(table_number + 1 ));// number that does not exist
+   }
 
+
+   private Review createDummyReviewForAUser(User user,String comment){
+        return  new Review(user,Mockito.mock(Rating.class),comment, LocalDateTime.now());
+   }
     @Tag("testing addReview adds user's first review while reviews are empty")
     @Test
     public void testAddReviewWorksForFirstReviewInList(){
-        fail();
+        User user1 = Mockito.mock(User.class);
+        Review review = createDummyReviewForAUser(user1,"comment");
+        restaurant.addReview(review);
+        assertThat(restaurant.getReviews()).contains(review);
     }
 
     @Tag("testing addReview adds user's second review while there isn't any other user")
     @Test
     public void testAddReviewWorksForSecondReviewBeingSecondReviewInList(){
-        fail();
+        User user1 = Mockito.mock(User.class);
+        Review review1 = createDummyReviewForAUser(user1,"comment1");
+        restaurant.addReview(review1);
+        Review review2 = createDummyReviewForAUser(user1,"comment2");
+        restaurant.addReview(review2);
+        assertThat(restaurant.getReviews()).doesNotContain(review1);
+        assertThat(restaurant.getReviews()).contains(review2);
     }
 
 
     @Tag("testing addReview adds user's second review while another user has a review in the list")
     @Test
     public void testAddReviewWorksForSecondReviewBeingThirdReviewInList(){
-        fail();
+        User user2 = Mockito.mock(User.class);
+        Review review2_2 = createDummyReviewForAUser(user2,"comment1 user2");
+        restaurant.addReview(review2_2);
+
+        User user1 = Mockito.mock(User.class);
+        Review review1 = createDummyReviewForAUser(user1,"comment1 user1");
+        restaurant.addReview(review1);
+        Review review2 = createDummyReviewForAUser(user1,"comment2 user1");
+        restaurant.addReview(review2);
+
+        assertThat(restaurant.getReviews()).contains(review2_2);
+        assertThat(restaurant.getReviews()).doesNotContain(review1);
+        assertThat(restaurant.getReviews()).contains(review2);
     }
 
 

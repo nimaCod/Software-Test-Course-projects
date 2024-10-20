@@ -52,7 +52,6 @@ public class UserTest {
     @Tag("Test if getReservation does not find a reservation because does not exist")
     @Test
     public void testGetReservationDoesNotFindReservation(){
-        Reservation reservation = reservations.get(0);
         assertNull(user.getReservation(0));
         fail(); // nonsense test ???
     }
