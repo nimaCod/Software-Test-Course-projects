@@ -48,4 +48,13 @@ public class TableTest {
     public void testIsReservedWhenNoReservationExists(){
         assertFalse(table.isReserved(LocalDateTime.now()));
     }
+
+    @Tag("Test to check if isReserved works when there is a reservation.")
+    @Test
+    public void testIsReservedWhenReservationExists(){
+        Mockito.when(reservations.get(0).getDateTime()).thenReturn(LocalDateTime.of(2024, 10, 20, 12, 0));
+        Reservation reservation = reservations.get(0);
+        table.addReservation(reservation);
+        assertTrue(table.isReserved(reservation.getDateTime()));
+    }
 }
