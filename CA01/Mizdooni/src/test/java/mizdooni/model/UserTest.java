@@ -52,13 +52,19 @@ public class UserTest {
     @Tag("Test if getReservation does not find a reservation because does not exist")
     @Test
     public void testGetReservationDoesNotFindReservation(){
-        fail();
+        Reservation reservation = reservations.get(0);
+        assertNull(user.getReservation(0));
+        fail(); // nonsense test ???
     }
 
     @Tag("Test if getReservation does not find a reservation because it is cancelled")
     @Test
     public void testGetReservationDoesNotFindCancelledReservation(){
-        fail();
+        Reservation reservation = reservations.get(0);
+        user.addReservation(reservation);
+        int reservationNumber = reservation.getReservationNumber();
+        Mockito.when(reservations.get(0).isCancelled()).thenReturn(Boolean.TRUE);
+        assertNull(user.getReservation(reservationNumber));
     }
 
 
