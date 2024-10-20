@@ -9,21 +9,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserTest {
     List<Reservation> reservations;
     @Mock Address address;
     @Mock User.Role role;
-    @InjectMocks private User user;
+    private User user;
 
-    User create_user(){
+    User createDummyUser(){
         return new User("nima","password","nima@google.com",address,role);
     }
     @BeforeEach
     void setup(){
+        user = createDummyUser();
         reservations = Arrays.asList(
                 Mockito.mock(Reservation.class),
                 Mockito.mock(Reservation.class)
@@ -40,12 +40,38 @@ public class UserTest {
         assertEquals(0,reservationNumber);
     }
 
-    @Tag("Test if getReservation that gets an ID works.")
+    @Tag("Test if getReservation finds a reservation")
     @Test
-    public void testCheckReservation(){
+    public void testGetReservationFindsReservation(){
         Reservation reservation = reservations.get(1);
         user.addReservation(reservation);
         int reservationNumber = reservation.getReservationNumber();
         assertEquals(reservation,user.getReservation(reservationNumber));
     }
+
+    @Tag("Test if getReservation does not find a reservation because does not exist")
+    @Test
+    public void testGetReservationDoesNotFindReservation(){
+        fail();
+    }
+
+    @Tag("Test if getReservation does not find a reservation because it is cancelled")
+    @Test
+    public void testGetReservationDoesNotFindCancelledReservation(){
+        fail();
+    }
+
+
+    @Tag("Test if checkReservation returns True when there is a reservation")
+    @Test
+    public void testCheckReservationReturnsTrue(){
+        fail();
+    }
+
+    @Tag("Test if checkReservation returns False when there isn't a reservation")
+    @Test
+    public void testCheckReservationReturnsFalse(){
+        fail();
+    }
+
 }
