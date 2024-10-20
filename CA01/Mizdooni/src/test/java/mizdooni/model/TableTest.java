@@ -57,4 +57,16 @@ public class TableTest {
         table.addReservation(reservation);
         assertTrue(table.isReserved(reservation.getDateTime()));
     }
+
+    @Tag("Test to check if isReserved works when there is a reservation but is cancelled")
+    @Test
+    public void testIsReservedWhenReservationExistsButCancelled(){
+        Mockito.when(reservations.get(0).getDateTime()).thenReturn(LocalDateTime.of(2024, 10, 20, 12, 0));
+        Mockito.when(reservations.get(0).isCancelled()).thenReturn(Boolean.TRUE);
+        Reservation reservation = reservations.get(0);
+        table.addReservation(reservation);
+        assertFalse(table.isReserved(reservation.getDateTime()));
+    }
 }
+
+// bug detected: there could be reservations more than number of seats in a datetime
