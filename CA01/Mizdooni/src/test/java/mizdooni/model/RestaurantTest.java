@@ -37,6 +37,15 @@ public class RestaurantTest {
         return new Table(1,1,1);
     }
 
+    private Rating createRating(double food, double service, double ambiance, double overall) {
+        Rating rating = new Rating();
+        rating.food = food;
+        rating.service = service;
+        rating.ambiance = ambiance;
+        rating.overall = overall;
+        return rating;
+    }
+
     @BeforeEach
     public void setup(){
         restaurant = createDummyRestaurant();
@@ -117,19 +126,54 @@ public class RestaurantTest {
     @Tag("testing getAverageRating works while there isn't any review")
     @Test
     public void testGetAverageRatingWorksWhileNotHavingAnyReviews(){
-        fail();
+        Rating averageRating = restaurant.getAverageRating();
+
+        assertEquals(0, averageRating.food);
+        assertEquals(0, averageRating.service);
+        assertEquals(0, averageRating.ambiance);
+        assertEquals(0, averageRating.overall);
     }
 
     @Tag("testing getAverageRating works while having one review")
     @Test
     public void testGetAverageRatingWorksWhileHavingOneReview(){
-        fail();
+        Rating rating = createRating(5, 4, 3, 4);
+
+        Review review = Mockito.mock(Review.class);
+        Mockito.when(review.getRating()).thenReturn(rating);
+
+        restaurant.addReview(review);
+
+        Rating averageRating = restaurant.getAverageRating();
+
+        assertEquals(5, averageRating.food);
+        assertEquals(4, averageRating.service);
+        assertEquals(3, averageRating.ambiance);
+        assertEquals(4, averageRating.overall);
     }
 
     @Tag("testing getAverageRating works while having multiple reviews")
     @Test
     public void testGetAverageRatingWorksWhileHavingMultipleReviews(){
-        fail();
+        Rating rating1 = createRating(4, 3, 2, 3);
+        Rating rating2 = createRating(5, 4, 5, 4);
+
+        Review review1 = Mockito.mock(Review.class);
+        Review review2 = Mockito.mock(Review.class);
+        Mockito.when(review1.getRating()).thenReturn(rating1);
+        Mockito.when(review2.getRating()).thenReturn(rating2);
+        Mockito.when(review1.getUser()).thenReturn(Mockito.mock(User.class));
+        Mockito.when(review1.getUser()).thenReturn(Mockito.mock(User.class));
+
+        restaurant.addReview(review1);
+        restaurant.addReview(review2);
+
+        Rating averageRating = restaurant.getAverageRating();
+
+        assertEquals(4.5, averageRating.food);
+        assertEquals(3.5, averageRating.service);
+        assertEquals(3.5, averageRating.ambiance);
+        assertEquals(3.5, averageRating.overall);
     }
 
     @Tag("testing getMaxSeatsNumber while not having any tables")
