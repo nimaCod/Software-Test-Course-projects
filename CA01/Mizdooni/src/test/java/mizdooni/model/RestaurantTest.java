@@ -188,11 +188,10 @@ public class RestaurantTest {
     }
     @Tag("testing getMaxSeatsNumber while having some tables without any seats")
     @Test
-    @Disabled("This test returns 0 and assertion fails so it seems behavior has got no problem with no seats")
     public void testGetMaxSeatsNumberWhileHavingSomeTablesWithoutAnySeats(){
         Table table = getDummyTable(0);
         restaurant.addTable(table);
-        assertEquals(1,restaurant.getMaxSeatsNumber());
+        assertEquals(0,restaurant.getMaxSeatsNumber());
     }
 
     @Tag("testing getMaxSeatsNumber while having some tables with seats")
