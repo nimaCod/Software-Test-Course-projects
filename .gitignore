@@ -10,7 +10,7 @@ CA01/Mizdooni/buildNumber.properties
 CA01/Mizdooni/.mvn/timing.properties
 CA01/Mizdooni/.mvn/wrapper/maven-wrapper.jar
 CA01/Mizdooni/elastic-apm-agent-*.jar
-
+*.docx
 # IntelliJ IDEA
 .idea/
 *.iws
