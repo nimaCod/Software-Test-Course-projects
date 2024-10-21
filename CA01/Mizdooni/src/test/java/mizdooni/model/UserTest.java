@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,7 +54,6 @@ public class UserTest {
     @Test
     public void testGetReservationDoesNotFindReservation(){
         assertNull(user.getReservation(0));
-        fail(); // nonsense test ???
     }
 
     @Tag("Test if getReservation does not find a reservation because it is cancelled")
@@ -70,13 +70,46 @@ public class UserTest {
     @Tag("Test if checkReservation returns True when there is a reservation")
     @Test
     public void testCheckReservationReturnsTrue(){
-        fail();
+        Restaurant restaurant = Mockito.mock(Restaurant.class);
+        Reservation reservation = Mockito.mock(Reservation.class);
+
+        Mockito.when(reservation.getRestaurant()).thenReturn(restaurant);
+        Mockito.when(reservation.isCancelled()).thenReturn(false);
+        Mockito.when(reservation.getDateTime()).thenReturn(LocalDateTime.now().minusDays(1));
+
+        user.addReservation(reservation);
+        assertTrue(user.checkReserved(restaurant));
     }
 
     @Tag("Test if checkReservation returns False when there isn't a reservation")
     @Test
-    public void testCheckReservationReturnsFalse(){
-        fail();
+    public void testCheckReservationReturnsFalseWhenThereIsNoReservation(){
+        Restaurant restaurant = Mockito.mock(Restaurant.class);
+        assertFalse(user.checkReserved(restaurant));
+    }
+
+    @Tag("Test if checkReservation returns False when the reservation is cancelled")
+    @Test
+    public void testCheckReservationReturnsFalseWhenCancelled() {
+        Restaurant restaurant = Mockito.mock(Restaurant.class);
+        Reservation reservation = Mockito.mock(Reservation.class);
+
+        Mockito.when(reservation.isCancelled()).thenReturn(true);
+
+        user.addReservation(reservation);
+        assertFalse(user.checkReserved(restaurant));
+    }
+
+    @Tag("Test if checkReservation returns False when the reservation is in the future")
+    @Test
+    public void testCheckReservationReturnsFalseForFutureReservation() {
+        Restaurant restaurant = Mockito.mock(Restaurant.class);
+        Reservation reservation = Mockito.mock(Reservation.class);
+
+        Mockito.when(reservation.getDateTime()).thenReturn(LocalDateTime.now().plusDays(1));
+
+        user.addReservation(reservation);
+        assertFalse(user.checkReserved(restaurant));
     }
 
 }
