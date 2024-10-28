@@ -7,6 +7,7 @@ import mizdooni.response.Response;
 import mizdooni.response.ResponseException;
 import mizdooni.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,5 +92,23 @@ public class AuthenticationControllerTest {
         assertEquals(HttpStatus.UNAUTHORIZED,exception.getStatus());
         assertEquals( "invalid username or password", exception.getMessage());
     }
+
+    @Disabled
+    @Label("Test for signup")
+    @Test
+    public void signtest(){}
+
+    @Test
+    public void given_logged_in_user_when_logging_out_then_logs_out_successfully(){
+        Mockito.when(userService.logout()).thenReturn(true);
+        assertEquals(Response.ok("logout successful"),authenticationController.logout());
+    }
+
+    @Test
+    public void given_unauthorized_user_when_logging_out_then_throws_unauthorized_exception(){
+        Mockito.when(userService.logout()).thenReturn(false);
+        ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.logout());
+        assertEquals(HttpStatus.UNAUTHORIZED,exception.getStatus());
+        assertEquals( "no user logged in", exception.getMessage());    }
 }
 
