@@ -8,6 +8,7 @@ import mizdooni.response.serializer.HttpStatusSerializer;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -36,5 +37,23 @@ public class Response {
 
     public static Response ok(String message, Object data) {
         return new Response(HttpStatus.OK, message, true, null, data);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Response response = (Response) obj;
+        return success == response.success &&
+//                Objects.equals(timestamp, response.timestamp) && // why they have different timestamps
+                status == response.status &&
+                Objects.equals(error, response.error) &&
+                Objects.equals(message, response.message) &&
+                Objects.equals(data, response.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(timestamp, status, success, error, message, data);
     }
 }
