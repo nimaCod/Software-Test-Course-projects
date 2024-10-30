@@ -17,16 +17,17 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+import static mizdooni.controllers.ControllerUtils.PARAMS_BAD_TYPE;
 import static mizdooni.controllers.ControllerUtils.PARAMS_MISSING;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-
 public class AuthenticationControllerTest {
     private UserService userService = Mockito.mock(UserService.class);
     @InjectMocks
@@ -35,11 +36,10 @@ public class AuthenticationControllerTest {
     private User get_valid_user(String username, String password, String email){
         Address address = Mockito.mock(Address.class);
         User.Role role = Mockito.mock(User.Role.class);
-
         return new User(username, password, email, address,role);
 
     }
-    @Label("Test of User Method returns current user when user is not null")
+    @Label("user")
     @Test
     public void given_valid_user_when_calling_user_then_responses_ok(){
         User user = get_valid_user("username","password","email");
@@ -47,7 +47,7 @@ public class AuthenticationControllerTest {
         assertEquals( Response.ok("current user",user),authenticationController.user());
     }
 
-    @Label("Test of User Method throws exception UNAUTHORIZED when user is null")
+    @Label("user")
     @Test
     public void given_non_existing_user_when_calling_user_then_throws_unauthorized_exception(){
         Mockito.when(userService.getCurrentUser()).thenReturn(null);
@@ -56,7 +56,7 @@ public class AuthenticationControllerTest {
         assertEquals( "no user logged in", exception.getMessage());
     }
 
-    @Label("Test login Method works fine with correct username and password")
+    @Label("login")
     @Test
     public void given_valid_userPass_when_login_then_logs_in_successful(){
         String username = "username";
@@ -68,7 +68,7 @@ public class AuthenticationControllerTest {
         assertEquals(Response.ok("login successful",user),authenticationController.login(credentials));
     }
 
-    @Label("Test login Method throws bad request with no username or password")
+    @Label("login")
     @Test
     public void given_invalid_userPass_when_login_then_throws_bad_request_exception(){
         String username = "username";
@@ -80,7 +80,7 @@ public class AuthenticationControllerTest {
         assertEquals( PARAMS_MISSING, exception.getMessage());
     }
 
-    @Label("Test login Method throws unauthorized with wrong username or password")
+    @Label("login")
     @Test
     public void given_wrong_userPass_when_login_then_throws_unauthorized_exception(){
         String username = "username";
@@ -93,17 +93,87 @@ public class AuthenticationControllerTest {
         assertEquals( "invalid username or password", exception.getMessage());
     }
 
-    @Disabled
-    @Label("Test for signup")
+    @Label("signup")
     @Test
-    public void signtest(){}
+    public void given_valid_type_of_parameters_when_signup_then_responses_ok(){
+        String username = "ali123", password="password",email="email",role= "client",country="country",city="city";
+        Map<String, String> address = Map.of("country",country,"city",city);
+        Map<String,Object> credentials = Map.of("username", username,
+                "password",password,
+                "email",email,
+                "role",role,
+                "address",address);
+        User user = get_valid_user(username,password,email);
+        Mockito.when(userService.login(username,password)).thenReturn(true);
+        Mockito.when(userService.getCurrentUser()).thenReturn(user);
+        assertEquals(Response.ok("signup successful", user), authenticationController.signup(credentials));
+    }
 
+    @Label("signup")
+    @Test
+    public void given_insufficient_parameter_when_signup_then_throws_bad_request_exception(){
+        String username = "username", password="password";
+        Map<String,Object> credentials = Map.of("username", username,"password",password);
+        ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.signup(credentials));
+        assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
+        assertEquals( PARAMS_MISSING, exception.getMessage());
+    }
+
+    @Label("signup")
+    @Test
+    public void given_wrong_type_of_parameter_address_when_signup_then_throws_bad_request_exception_param_bad_type(){
+        String username = "username", password="password",email="email",role="role",address="address";
+        Map<String,Object> credentials = Map.of("username", username,
+                "password",password,
+                "email",email,
+                "role",role,
+                "address",address);
+        ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.signup(credentials));
+        assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
+        assertEquals( PARAMS_BAD_TYPE, exception.getMessage());
+    }
+
+    @Label("signup")
+    @Test
+    public void given_empty_type_of_parameter_username_when_signup_then_throws_bad_request_exception_param_missing(){
+        String username = "", password="password",email="email",role= "client",country="country",city="city";
+        Map<String, String> address = Map.of("country",country,"city",city);
+        Map<String,Object> credentials = Map.of("username", username,
+                "password",password,
+                "email",email,
+                "role",role,
+                "address",address);
+        ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.signup(credentials));
+        assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
+        assertEquals( PARAMS_MISSING, exception.getMessage());
+    }
+
+    @Label("signup")
+    @Test
+    public void given_invalid_type_of_parameter_username_and_login_fails_when_signup_then_throws_bad_request_exception(){
+        String username = "ali123!@", password="password",email="email",role= "client",country="country",city="city";
+        Map<String, String> address = Map.of("country",country,"city",city);
+        Map<String,Object> credentials = Map.of("username", username,
+                "password",password,
+                "email",email,
+                "role",role,
+                "address",address);
+        Mockito.when(userService.login(username,password)).thenReturn(false);
+        ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.signup(credentials));
+        assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
+    }
+
+
+
+
+    @Label("logout")
     @Test
     public void given_logged_in_user_when_logging_out_then_logs_out_successfully(){
         Mockito.when(userService.logout()).thenReturn(true);
         assertEquals(Response.ok("logout successful"),authenticationController.logout());
     }
 
+    @Label("logout")
     @Test
     public void given_unauthorized_user_when_logging_out_then_throws_unauthorized_exception(){
         Mockito.when(userService.logout()).thenReturn(false);
@@ -113,6 +183,7 @@ public class AuthenticationControllerTest {
     }
 
 // give list of invalid usernames in future!!! Farbod
+    @Label("validateUsername")
     @Test
     public void given_invalid_username_when_validating_username_then_throws_bad_request_exception(){
         String invalid_username = "ali123@";
@@ -122,6 +193,7 @@ public class AuthenticationControllerTest {
     }
 
 // give list of valid usernames
+    @Label("validateUsername")
     @Test
     public void given_existing_username_when_validating_username_then_throws_conflict_exception(){
         String valid_username = "ali123";
@@ -131,6 +203,7 @@ public class AuthenticationControllerTest {
         assertEquals( "username already exists", exception.getMessage());
     }
 
+    @Label("validateUsername")
     @Test
     public void given_valid_username_when_validating_username_then_returns_ok(){
         String valid_username = "ali123";
@@ -140,6 +213,7 @@ public class AuthenticationControllerTest {
 
 
     // give list of invalid emails in future!!! Farbod
+    @Label("validateEmail")
     @Test
     public void given_invalid_email_when_validating_email_then_throws_bad_request_exception(){
         String invalid_email = "ali123@";
@@ -149,6 +223,7 @@ public class AuthenticationControllerTest {
     }
 
     // give list of valid emails
+    @Label("validateEmail")
     @Test
     public void given_existing_email_when_validating_email_then_throws_conflict_exception(){
         String valid_email = "ali123@x.c";
@@ -158,6 +233,7 @@ public class AuthenticationControllerTest {
         assertEquals( "email already registered", exception.getMessage());
     }
 
+    @Label("validateEmail")
     @Test
     public void given_valid_email_when_validating_email_then_returns_ok(){
         String valid_email = "ali123@x.c";
