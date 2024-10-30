@@ -71,7 +71,9 @@ public class AuthenticationController {
 
         try {
             userService.signup(username, password, email, address, role);
-            userService.login(username, password);
+            if(!userService.login(username, password)) {
+              throw new Exception("login failed");
+            }
             return Response.ok("signup successful", userService.getCurrentUser());
         } catch (Exception ex) {
             throw new ResponseException(HttpStatus.BAD_REQUEST, ex);
