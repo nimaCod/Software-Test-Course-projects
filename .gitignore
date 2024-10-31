@@ -1,15 +1,15 @@
-CA01/Mizdooni/target/
-CA01/Mizdooni/out/
-CA01/Mizdooni/pom.xml.tag
-CA01/Mizdooni/pom.xml.releaseBackup
-CA01/Mizdooni/pom.xml.versionsBackup
-CA01/Mizdooni/pom.xml.next
-CA01/Mizdooni/release.properties
-CA01/Mizdooni/dependency-reduced-pom.xml
-CA01/Mizdooni/buildNumber.properties
-CA01/Mizdooni/.mvn/timing.properties
-CA01/Mizdooni/.mvn/wrapper/maven-wrapper.jar
-CA01/Mizdooni/elastic-apm-agent-*.jar
+CA02/Mizdooni/target/
+CA02/Mizdooni/out/
+CA02/Mizdooni/pom.xml.tag
+CA02/Mizdooni/pom.xml.releaseBackup
+CA02/Mizdooni/pom.xml.versionsBackup
+CA02/Mizdooni/pom.xml.next
+CA02/Mizdooni/release.properties
+CA02/Mizdooni/dependency-reduced-pom.xml
+CA02/Mizdooni/buildNumber.properties
+CA02/Mizdooni/.mvn/timing.properties
+CA02/Mizdooni/.mvn/wrapper/maven-wrapper.jar
+CA02/Mizdooni/elastic-apm-agent-*.jar
 *.docx
 # IntelliJ IDEA
 .idea/
