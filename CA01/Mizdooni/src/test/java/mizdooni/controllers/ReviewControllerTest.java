@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import java.util.Map;
 
+import static mizdooni.controllers.ControllerUtils.PARAMS_BAD_TYPE;
 import static mizdooni.controllers.ControllerUtils.PARAMS_MISSING;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,5 +83,21 @@ public class ReviewControllerTest {
         exception = assertThrows(ResponseException.class, () -> reviewController.addReview(1, params));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         assertEquals(PARAMS_MISSING, exception.getMessage());
+    }
+
+    @Label("in addReview() having bad request error because of invalid rating values")
+    @Test
+    public void given_invalid_rating_values_when_adding_review_then_throws_bad_request(){
+        Mockito.when(restaurantService.getRestaurant(1)).thenReturn(new Restaurant("name", Mockito.mock(User.class), "", LocalTime.of(1,1,1), LocalTime.now(), "address", Mockito.mock(Address.class), "link"));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("comment", "this is a comment");
+        Map<String, String> rating = Map.of("food", "5.0", "service", "4.0", "ambiance", "5.0", "overall", "4.5");
+        params.put("rating", rating);
+
+        ResponseException exception = assertThrows(ResponseException.class, () -> reviewController.addReview(1, params));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals(PARAMS_BAD_TYPE, exception.getMessage());
     }
 }
