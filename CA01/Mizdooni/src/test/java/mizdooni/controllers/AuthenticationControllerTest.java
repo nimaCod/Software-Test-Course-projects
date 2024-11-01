@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -179,21 +181,19 @@ public class AuthenticationControllerTest {
         assertEquals( "no user logged in", exception.getMessage());
     }
 
-// give list of invalid usernames in future!!! Farbod
     @Label("validateUsername")
-    @Test
-    public void given_invalid_username_when_validating_username_then_throws_bad_request_exception(){
-        String invalid_username = "ali123@";
-        ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.validateUsername(invalid_username));
+    @ParameterizedTest
+    @ValueSource(strings = {"user name", "user-name", "user@name", "user.name", "user!name","username#1","user*name","      "})
+    public void given_invalid_username_when_validating_username_then_throws_bad_request_exception(String username){
+        ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.validateUsername(username));
         assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
         assertEquals( "invalid username format", exception.getMessage());
     }
 
-// give list of valid usernames
-    @Label("validateUsername")
-    @Test
-    public void given_existing_username_when_validating_username_then_throws_conflict_exception(){
-        String valid_username = "ali123";
+@Label("validateUsername")
+@ParameterizedTest
+@ValueSource(strings = {"username", "username123", "UserName", "user_name", "123","USERNAME"})
+public void given_existing_username_when_validating_username_then_throws_conflict_exception(String valid_username){
         Mockito.when(userService.usernameExists(valid_username)).thenReturn(true);
         ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.validateUsername(valid_username));
         assertEquals(HttpStatus.CONFLICT,exception.getStatus());
@@ -201,29 +201,28 @@ public class AuthenticationControllerTest {
     }
 
     @Label("validateUsername")
-    @Test
-    public void given_valid_username_when_validating_username_then_returns_ok(){
-        String valid_username = "ali123";
+    @ParameterizedTest
+    @ValueSource(strings = {"username", "username123", "UserName", "user_name", "123","USERNAME"})
+    public void given_valid_username_when_validating_username_then_returns_ok(String valid_username){
         Mockito.when(userService.logout()).thenReturn(false);
         assertEquals(Response.ok("username is available"),authenticationController.validateUsername(valid_username));
     }
 
 
-    // give list of invalid emails in future!!! Farbod
     @Label("validateEmail")
-    @Test
-    public void given_invalid_email_when_validating_email_then_throws_bad_request_exception(){
-        String invalid_email = "ali123@";
+    @ParameterizedTest
+    @ValueSource(strings = {"user@name", "user@.com", "user@name.", "@name.com", "user@name.com.",
+            "user@name_com","user@-name.com","user@name,com"," ","us.er@name.com","user@name.ac.com"})
+    public void given_invalid_email_when_validating_email_then_throws_bad_request_exception(String invalid_email){
         ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.validateEmail(invalid_email));
         assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
         assertEquals( "invalid email format", exception.getMessage());
     }
 
-    // give list of valid emails
     @Label("validateEmail")
-    @Test
-    public void given_existing_email_when_validating_email_then_throws_conflict_exception(){
-        String valid_email = "ali123@x.c";
+    @ParameterizedTest
+    @ValueSource(strings = {"user@name.com", "user123@name.com", "us_er@name.com","user@name123.com","123@123.com"})
+    public void given_existing_email_when_validating_email_then_throws_conflict_exception(String valid_email){
         Mockito.when(userService.emailExists(valid_email)).thenReturn(true);
         ResponseException exception =  assertThrows(ResponseException.class,() -> authenticationController.validateEmail(valid_email));
         assertEquals(HttpStatus.CONFLICT,exception.getStatus());
@@ -231,9 +230,9 @@ public class AuthenticationControllerTest {
     }
 
     @Label("validateEmail")
-    @Test
-    public void given_valid_email_when_validating_email_then_returns_ok(){
-        String valid_email = "ali123@x.c";
+    @ParameterizedTest
+    @ValueSource(strings = {"user@name.com", "user123@name.com", "us_er@name.com","user@name123.com","123@123.com"})
+    public void given_valid_email_when_validating_email_then_returns_ok(String valid_email){
         Mockito.when(userService.logout()).thenReturn(false);
         assertEquals(Response.ok("email not registered"),authenticationController.validateEmail(valid_email));
     }
