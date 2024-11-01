@@ -90,12 +90,11 @@ public class ReviewControllerTest {
 
     @Label("getReviews")
     @Test
-    public void given_valid_parameters_and_restaurant_not_found_when_getting_reviews_then_throws_bad_Request(){
+    public void given_valid_parameters_and_restaurant_not_found_when_getting_reviews_then_throws_bad_Request() throws RestaurantNotFound {
         Restaurant restaurant = new Restaurant("name", Mockito.mock(User.class), "", LocalTime.of(1,1,1), LocalTime.now(), "address", Mockito.mock(Address.class), "link");
         Mockito.when(restaurantService.getRestaurant(restaurant.getId())).thenReturn(restaurant);
-        try {
-            Mockito.when(reviewService.getReviews(restaurant.getId(),1)).thenThrow(new Exception(""));
-        } catch (Exception ignored) {}
+        Mockito.when(reviewService.getReviews(restaurant.getId(),1)).thenThrow(new RuntimeException("error"));
+
         ResponseException exception =  assertThrows(ResponseException.class,() -> reviewController.getReviews(restaurant.getId(), 1));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
 
