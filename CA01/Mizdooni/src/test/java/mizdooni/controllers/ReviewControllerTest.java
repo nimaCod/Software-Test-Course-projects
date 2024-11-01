@@ -3,8 +3,10 @@ package mizdooni.controllers;
 import jdk.jfr.Label;
 
 
+import mizdooni.exceptions.RestaurantNotFound;
 import mizdooni.model.*;
 
+import mizdooni.response.PagedList;
 import mizdooni.response.Response;
 import mizdooni.response.ResponseException;
 import mizdooni.service.RestaurantService;
@@ -23,6 +25,7 @@ import java.time.LocalTime;
 
 import java.util.HashMap;
 
+import java.util.List;
 import java.util.Map;
 
 import static mizdooni.controllers.ControllerUtils.PARAMS_BAD_TYPE;
@@ -40,11 +43,25 @@ public class ReviewControllerTest {
     @InjectMocks
     private ReviewController reviewController;
 
-    @Label("Restaurant does not exist")
+    @Label("getting not found error for getReviews when Restaurant does not exist")
     @Test
     public void given_invalid_restaurant_id_when_getting_reviews_then_responses_not_found(){
         ResponseException exception =  assertThrows(ResponseException.class,() -> reviewController.getReviews(1, 1));
         assertEquals(HttpStatus.NOT_FOUND,exception.getStatus());
+    }
+
+    @Label("getting 200 response (with empty data) for getReviews when there is no review but restaurant exists")
+    @Test
+    public void given_valid_restaurant_id_with_no_reviews_when_getting_reviews_then_returns_empty_list() {
+        Mockito.when(restaurantService.getRestaurant(1)).thenReturn(new Restaurant("name", Mockito.mock(User.class), "", LocalTime.of(1,1,1), LocalTime.now(), "address", Mockito.mock(Address.class), "link"));
+        try {
+            Mockito.when(reviewService.getReviews(1, 1)).thenReturn(new PagedList<>(List.of(), 1, 10));
+        } catch (RestaurantNotFound e) {
+            throw new RuntimeException(e);
+        }
+
+        Response response = reviewController.getReviews(1, 1);
+        assertEquals(response, new Response(HttpStatus.OK, "reviews for restaurant (" + 1 + "): " + "name", true, null, null));
     }
 
 
