@@ -56,4 +56,12 @@ public class Response {
     public int hashCode() {
         return Objects.hash(timestamp, status, success, error, message, data);
     }
+
+    public HttpStatus getStatus(){
+        return status;
+    }
+
+    public Object getData(){
+        return data;
+    }
 }
