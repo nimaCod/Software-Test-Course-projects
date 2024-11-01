@@ -163,9 +163,6 @@ public class AuthenticationControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
     }
 
-
-
-
     @Label("logout")
     @Test
     public void given_logged_in_user_when_logging_out_then_logs_out_successfully(){
