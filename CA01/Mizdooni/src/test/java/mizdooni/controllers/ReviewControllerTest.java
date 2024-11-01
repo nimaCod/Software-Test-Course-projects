@@ -100,4 +100,17 @@ public class ReviewControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         assertEquals(PARAMS_BAD_TYPE, exception.getMessage());
     }
+
+    @Label("getting not found error for addReview when restaurant does not exist")
+    @Test
+    public void given_non_existent_restaurant_id_when_adding_review_then_responses_not_found() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("comment", "this is comment");
+        Map<String, Double> rating = Map.of("food", 4.5, "service", 4.0, "ambiance", 5.0, "overall", 4.5);
+        params.put("rating", rating);
+
+        ResponseException exception = assertThrows(ResponseException.class, () -> reviewController.addReview(2, params));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    }
 }
