@@ -63,9 +63,9 @@ public class ReviewControllerTest {
 
     }
 
-    @Label("trying to add a review with missing comment causing error")
+    @Label("trying to add a review with missing param causing error")
     @Test
-    public void given_missing_comment_when_adding_review_then_throws_bad_request(){
+    public void given_missing_param_when_adding_review_then_throws_bad_request(){
         Mockito.when(restaurantService.getRestaurant(1)).thenReturn(new Restaurant("name", Mockito.mock(User.class), "", LocalTime.of(1,1,1), LocalTime.now(), "address", Mockito.mock(Address.class), "link"));
 
         Map<String, Object> params = new HashMap<>();
@@ -73,10 +73,14 @@ public class ReviewControllerTest {
         params.put("rating", rating);
 
         ResponseException exception = assertThrows(ResponseException.class, () -> reviewController.addReview(1, params));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals(PARAMS_MISSING, exception.getMessage());
 
+        params.clear();
+        params.put("comment", "this is a comment");
+
+        exception = assertThrows(ResponseException.class, () -> reviewController.addReview(1, params));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         assertEquals(PARAMS_MISSING, exception.getMessage());
     }
-
-
 }
